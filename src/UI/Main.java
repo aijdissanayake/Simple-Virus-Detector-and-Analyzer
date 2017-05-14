@@ -14,8 +14,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -33,6 +35,7 @@ public class Main extends javax.swing.JFrame {
     private File selectedFile;
     private String fileHash;
     private boolean detected = false;
+    private String path;
 
     /**
      * Creates new form main
@@ -224,23 +227,23 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 47, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
             .addGroup(layout.createSequentialGroup()
-                .addGap(143, 143, 143)
+                .addGap(118, 118, 118)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(40, 40, 40)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -262,10 +265,10 @@ public class Main extends javax.swing.JFrame {
         final JFileChooser fc = new JFileChooser();
         
         int returnVal = fc.showOpenDialog(filePicker);
-
+        path = null;
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            String path = file.getAbsolutePath();
+            path = file.getAbsolutePath();
             System.out.println(path);
             if(file.exists()){ this.fileSelected = true;}
             pathField.setText(path);
@@ -278,6 +281,7 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_filePickerActionPerformed
 
     private void scanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scanButtonActionPerformed
+        if (path != null){
         try {
             System.out.println(selectedFile.exists());
             fileHash = this.hasher.generateHash(selectedFile);
@@ -294,15 +298,36 @@ public class Main extends javax.swing.JFrame {
                     break;               
                 }
                 
-                statusLabel.setText("Scaning finished check the report!");
-                if(!detected){reportArea.setText("No Virus Detected."+System.getProperty("line.separator")+"Keep in mind to update the Database");}
-                
             }
             //Files.write(Paths.get("virus_signatures.txt"), "new line added".getBytes(), StandardOpenOption.APPEND);
+            
+            statusLabel.setText("Scaning finished check the report!");
+            if(!detected){reportArea.setText("No Virus Detected."+System.getProperty("line.separator")+"Keep in mind to update the Database");}
+
+            Path fileLocater = Paths.get(path);
+            BasicFileAttributes attr = Files.readAttributes( fileLocater, BasicFileAttributes.class);
+            
+            String nextline = System.getProperty("line.separator");
+            String metadata = nextline + "File Information :" +nextline+ 
+            "creationTime: " + attr.creationTime() + nextline +
+            "lastAccessTime: " + attr.lastAccessTime() + nextline +
+            "lastModifiedTime: " + attr.lastModifiedTime() + nextline +
+            "Directory: " + attr.isDirectory()+ nextline + 
+            "Other: " + attr.isOther() + nextline +
+            "RegularFile: " + attr.isRegularFile() + nextline +
+            "SymbolicLink: " + attr.isSymbolicLink()+ nextline +
+            "size: " + attr.size() ;
+            
+            reportArea.append(metadata);
 
         }catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+        }
+        else{
+            showMessageDialog(null, "Select a File!");
+        }
+        
     }//GEN-LAST:event_scanButtonActionPerformed
 
     private void updateFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateFieldActionPerformed
