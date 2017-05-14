@@ -5,6 +5,7 @@
  */
 package UI;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +21,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javafx.scene.paint.Color.color;
 import javax.swing.JFileChooser;
 import static javax.swing.JOptionPane.showMessageDialog;
 import logic.Hasher;
@@ -258,7 +260,8 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_pathFieldActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        reportArea.setText("");
+        pathField.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void filePickerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filePickerActionPerformed
@@ -294,6 +297,7 @@ public class Main extends javax.swing.JFrame {
                 
                 if (line.trim().equals(fileHash.trim())){ 
                     reportArea.setText("Virus Detected"+System.getProperty("line.separator")+"Please Check and Remove the file manually");
+                    reportArea.setForeground(Color.red);
                     detected = true;
                     break;               
                 }
@@ -302,13 +306,17 @@ public class Main extends javax.swing.JFrame {
             //Files.write(Paths.get("virus_signatures.txt"), "new line added".getBytes(), StandardOpenOption.APPEND);
             
             statusLabel.setText("Scaning finished check the report!");
-            if(!detected){reportArea.setText("No Virus Detected."+System.getProperty("line.separator")+"Keep in mind to update the Database");}
+            if(!detected){
+                reportArea.setText("No Virus Detected."+System.getProperty("line.separator")+"Keep in mind to update the Database");
+                reportArea.setForeground(Color.green);
+            }
 
             Path fileLocater = Paths.get(path);
             BasicFileAttributes attr = Files.readAttributes( fileLocater, BasicFileAttributes.class);
             
             String nextline = System.getProperty("line.separator");
             String metadata = nextline + "File Information :" +nextline+ 
+            "File Hash (MD5): " + fileHash + nextline +
             "creationTime: " + attr.creationTime() + nextline +
             "lastAccessTime: " + attr.lastAccessTime() + nextline +
             "lastModifiedTime: " + attr.lastModifiedTime() + nextline +
