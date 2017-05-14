@@ -17,7 +17,8 @@ public class VirusDetectorAndAnalyzer {
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
         Hasher hasher = new Hasher();
-        hasher.generateHash();
+//        hasher.generateHash();
+        hasher.otherHash();
     }
     
 }
