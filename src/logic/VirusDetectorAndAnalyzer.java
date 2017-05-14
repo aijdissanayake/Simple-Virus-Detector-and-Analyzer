@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package virus.detector.and.analyzer;
+package logic;
 
 /**
  *
@@ -14,8 +14,10 @@ public class VirusDetectorAndAnalyzer {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // TODO code application logic here
+        Hasher hasher = new Hasher();
+        hasher.generateHash();
     }
     
 }
