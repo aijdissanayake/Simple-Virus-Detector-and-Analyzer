@@ -6,9 +6,16 @@
 package UI;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -25,6 +32,7 @@ public class Main extends javax.swing.JFrame {
     private final Hasher hasher;
     private File selectedFile;
     private String fileHash;
+    private boolean detected = false;
 
     /**
      * Creates new form main
@@ -208,34 +216,27 @@ public class Main extends javax.swing.JFrame {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         try(BufferedReader br = new BufferedReader(new FileReader("virus_signatures.txt"))) {
-            int count = 1;
             for(String line; (line = br.readLine()) != null; ) {
-                
-                synchronized(this){
-                switch(count) {
-                    case 1 :
-                       statusLabel.setText("Scaning.");
-                    case 2 :
-                       statusLabel.setText("Scaning..");
-                    case 3 :
-                       statusLabel.setText("Scaning...");
-                    case 4 :
-                       statusLabel.setText("Scaning....");
-                    case 5 :
-                       statusLabel.setText("Scaning.....");
-                    case 6 :
-                       statusLabel.setText("Scaning......");
-                    case 7 :
-                       statusLabel.setText("Scaning.......");
-                 }
-                if(count == 7){count = 1;}else{count = count + 1;}
                 System.out.println(line.trim());
                 
-                if (line == fileHash){ reportArea.setText("Virus Detected. /n ");}
-                
+                if (line.trim().equals(fileHash.trim())){ 
+                    reportArea.setText("Virus Detected"+System.getProperty("line.separator")+"Please Check and Remove the file manually");
+                    detected = true;
+                    break;               
                 }
+                
                 statusLabel.setText("Scaning finished check the report!");
+                if(!detected){reportArea.setText("No Virus Detected."+System.getProperty("line.separator")+"Keep in mind to update the Database");}
+                
             }
+            //Files.write(Paths.get("virus_signatures.txt"), "new line added".getBytes(), StandardOpenOption.APPEND);
+//          BufferedWriter bw = new BufferedWriter(new FileWriter("virus_signatures.txt", true));
+//            bw.newLine();
+//            bw.write("400:08311998:Inprise Corporation:249.95");
+//            bw.newLine();
+//            bw.write("400:08311998:Inprise Corporation:249.95");
+//            bw.flush();
+//            bw.close();
         }catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
