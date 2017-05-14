@@ -5,7 +5,9 @@
  */
 package UI;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +22,7 @@ import logic.Hasher;
 public class Main extends javax.swing.JFrame {
 
     private boolean fileSelected;
-    private Hasher hasher = new Hasher();
+    private final Hasher hasher;
     private File selectedFile;
     private String fileHash;
 
@@ -28,6 +30,7 @@ public class Main extends javax.swing.JFrame {
      * Creates new form main
      */
     public Main() {
+        this.hasher = new Hasher();
         initComponents();
     }
 
@@ -48,7 +51,7 @@ public class Main extends javax.swing.JFrame {
         statusLabel = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        reportArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
         scanButton = new javax.swing.JButton();
 
@@ -77,9 +80,9 @@ public class Main extends javax.swing.JFrame {
 
         jLabel4.setText("Report      :");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        reportArea.setColumns(20);
+        reportArea.setRows(5);
+        jScrollPane1.setViewportView(reportArea);
 
         jButton1.setText("Clear");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -200,8 +203,40 @@ public class Main extends javax.swing.JFrame {
     private void scanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scanButtonActionPerformed
         try {
             System.out.println(selectedFile.exists());
-            this.hasher.generateHash(selectedFile);
+            fileHash = this.hasher.generateHash(selectedFile);
         } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try(BufferedReader br = new BufferedReader(new FileReader("virus_signatures.txt"))) {
+            int count = 1;
+            for(String line; (line = br.readLine()) != null; ) {
+                
+                synchronized(this){
+                switch(count) {
+                    case 1 :
+                       statusLabel.setText("Scaning.");
+                    case 2 :
+                       statusLabel.setText("Scaning..");
+                    case 3 :
+                       statusLabel.setText("Scaning...");
+                    case 4 :
+                       statusLabel.setText("Scaning....");
+                    case 5 :
+                       statusLabel.setText("Scaning.....");
+                    case 6 :
+                       statusLabel.setText("Scaning......");
+                    case 7 :
+                       statusLabel.setText("Scaning.......");
+                 }
+                if(count == 7){count = 1;}else{count = count + 1;}
+                System.out.println(line.trim());
+                
+                if (line == fileHash){ reportArea.setText("Virus Detected. /n ");}
+                
+                }
+                statusLabel.setText("Scaning finished check the report!");
+            }
+        }catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_scanButtonActionPerformed
@@ -250,8 +285,8 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField pathField;
+    private javax.swing.JTextArea reportArea;
     private javax.swing.JButton scanButton;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
